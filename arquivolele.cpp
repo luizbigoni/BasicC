@@ -121,7 +121,7 @@ int BuscaCli(FILE *Ptr, char cod[]) //busca cliente OK
 
 int validacaoData(int dia,int mes,int ano) //validação de data OK
 {
- if(dia>0 && dia<=30 && mes>0 && mes<=12 && ano<=2023)
+ if(dia>0 && dia<=30 && mes>0 && mes<=12 && ano>=2023)
 	return 1;
 else
 	return -1; 
@@ -295,20 +295,20 @@ int ValidarCPF(char cpf2[11]) //validação de cpf
 	{
         cpf[i] = cpf2[i] - '0';
     }
-    soma=0;
-    for(i=0, mult=10; i<9 ; i++, mult--)
-        soma = soma + (cpf[i]*mult);
-    resto = soma%11;
-    if((11-resto) == cpf[9] || ((11-resto) == 10 || 11) == (cpf[9]==0))
-    {
-        soma=0;
-        for(i=0, mult=11; i<10 ; i++, mult--)
-            soma = soma + (cpf[i]*mult);
-        resto = soma%11;
-        if((11-resto) == cpf[10] || ((11-resto) == 10 || 11) == (cpf[10]==0))
-            return 1; // CPF CORRETO
-        else
-            return 0; //CPF INCORRETO
+	    soma=0;
+	    for(i=0, mult=10; i<9 ; i++, mult--)
+	        soma = soma + (cpf[i]*mult);
+	    resto = soma%11;
+	    if((11-resto) == cpf[9] || ((11-resto) == 10 || 11) == (cpf[9]==0))
+	    {
+	        soma=0;
+	        for(i=0, mult=11; i<10 ; i++, mult--)
+	            soma = soma + (cpf[i]*mult);
+	        resto = soma%11;
+	        if((11-resto) == cpf[10] || ((11-resto) == 10 || 11) == (cpf[10]==0))
+	            return 1; // CPF CORRETO
+	        else
+	            return 0; //CPF INCORRETO
     }
     else
         return 0; //CPF INCORRETO
@@ -318,7 +318,7 @@ int ValidarCPF(char cpf2[11]) //validação de cpf
 void CadastroCliente() //cadastro Cliente OK
 {
 	tpCliente Cli;
-	int pos, i, j, x;
+	int pos, i, j, x, fim=1;
 	char AuxCPF[TF];
 	FILE *PtrCli = fopen("cliente.dat","ab+");
 	
@@ -330,72 +330,95 @@ void CadastroCliente() //cadastro Cliente OK
 	printf("CPF do Cliente: ");
 	fflush(stdin);
 	scanf("%s", &AuxCPF);
-	while(strlen(AuxCPF) == 11)
+	while(fim!=0)
 	{
-		//x=1;
-		x=ValidarCPF(AuxCPF);
-		if(x==1)
+		
+		while(strlen(AuxCPF) == 11)
 		{
-			pos = BuscaCli(PtrCli, AuxCPF);
-			if(pos==-1)
+			//x=1;
+			x=ValidarCPF(AuxCPF);
+			if(x==1)
 			{
-				strcpy(Cli.CPF,AuxCPF);
-				gotoxy(34, 13);
-				printf("Nome do Cliente: ");
-				fflush(stdin);
-				gets(Cli.Nome);
-				Cli.QtdeCompras=0;
-				Cli.ValorTotal=0;
-				Cli.status='A';
-				fwrite(&Cli,sizeof(tpCliente),1,PtrCli);
-				gotoxy(34,15);
-				printf("Cliente cadastrado!");
-				getch();
-				//limpar a tela para continuar cadastrando
-				for(i = 10;i<23;i++)
-				{	for(j = 29;j<79;j++)
-					{
-						gotoxy(j,i);
-						printf(" ");
+				pos = BuscaCli(PtrCli, AuxCPF);
+				if(pos==-1)
+				{
+					strcpy(Cli.CPF,AuxCPF);
+					gotoxy(34, 13);
+					printf("Nome do Cliente: ");
+					fflush(stdin);
+					gets(Cli.Nome);
+					Cli.QtdeCompras=0;
+					Cli.ValorTotal=0;
+					Cli.status='A';
+					fwrite(&Cli,sizeof(tpCliente),1,PtrCli);
+					gotoxy(34,15);
+					printf("Cliente cadastrado!");
+					getch();
+					//limpar a tela para continuar cadastrando
+					for(i = 12;i<23;i++)
+					{	for(j = 29;j<79;j++)
+						{
+							gotoxy(j,i);
+							printf(" ");
+						}
+					}
+				}
+				else
+				{
+					gotoxy(34, 13);
+					printf("Cliente ja cadastrado! Digite outro.");
+					getch();
+					//limpar a tela para continuar cadastrando
+					for(i = 12;i<23;i++)
+					{	for(j = 29;j<79;j++)
+						{
+							gotoxy(j,i);
+							printf(" ");
+						}
 					}
 				}
 			}
 			else
 			{
-				gotoxy(34, 13);
-				printf("Cliente ja cadastrado! digite outro.");
+				gotoxy(34,14);
+				printf("CPF invalido!");
 				getch();
 				//limpar a tela para continuar cadastrando
-				for(i = 10;i<23;i++)
+				for(i = 12;i<23;i++)
 				{	for(j = 29;j<79;j++)
 					{
 						gotoxy(j,i);
 						printf(" ");
 					}
-				}
+				}			
 			}
-			
-
-		}
+			gotoxy(34, 12);
+			printf("CPF do Cliente: ");
+			fflush(stdin);
+			scanf("%s", &AuxCPF);			
+		}		
+		if(strlen(AuxCPF)==1)
+			fim=0;
 		else
 		{
-			gotoxy(34,14);
-			printf("CPF invalido!");
+			gotoxy(34, 13);
+			printf("CPF invalido! Digite outro.");
 			getch();
 			//limpar a tela para continuar cadastrando
-			for(i = 10;i<23;i++)
+			for(i = 12;i<23;i++)
 			{	for(j = 29;j<79;j++)
 				{
 					gotoxy(j,i);
 					printf(" ");
 				}
-			}			
-			
-		}
+			}
 			gotoxy(34, 12);
 			printf("CPF do Cliente: ");
-			scanf("%d",&AuxCPF);			
+			fflush(stdin);
+			scanf("%s", &AuxCPF);
+		}
 	}
+	fclose(PtrCli);
 	
 }
 
@@ -478,56 +501,57 @@ void ConsultarFornecedor(void) //cunsultar fornecedor OK
 		printf("Erro de abertura! Arquivo inexistente");
 	}	
 	else
+	{
+		gotoxy(34,12);
+		printf("Codigo do fornecedor: ");
+		scanf("%d",&Forn.Cod);
+		while (Forn.Cod>0)
 		{
+			pos = BuscaFornecedor(PtrForn,Forn.Cod);
+			if (pos==-1)
+			{
+				gotoxy(34,13);
+				printf("Fornecedor nao encontrada!");
+			}
+			else
+				{
+				
+					fseek(PtrForn,pos,0);
+					fread(&Forn,sizeof(tpFornecedor),1,PtrForn);
+					gotoxy(34,15);
+					printf("Codigo: %d", Forn.Cod);
+					gotoxy(34,16);
+					printf("Nome: %s", Forn.Nome);
+					gotoxy(34,17);
+					printf("Cdade: %s",Forn.Cid);	
+				}
+			getch();
+			for(i = 10;i<23;i++)
+			{
+				for(j = 29;j<79;j++)
+					{
+						gotoxy(j,i);
+						printf(" ");
+					}	
+			}
 			gotoxy(34,12);
 			printf("Codigo do fornecedor: ");
 			scanf("%d",&Forn.Cod);
-			while (Forn.Cod>0)
-			{
-				pos = BuscaFornecedor(PtrForn,Forn.Cod);
-				if (pos==-1)
-				{
-					gotoxy(34,13);
-					printf("Fornecedor nao encontrada!");
-				}
-				else
-					{
-					
-						fseek(PtrForn,pos,0);
-						fread(&Forn,sizeof(tpFornecedor),1,PtrForn);
-						gotoxy(34,15);
-						printf("Codigo: %d", Forn.Cod);
-						gotoxy(34,16);
-						printf("Nome: %s", Forn.Nome);
-						gotoxy(34,17);
-						printf("Cdade: %s",Forn.Cid);	
-					}
-				getch();
-				for(i = 10;i<23;i++)
-				{
-					for(j = 29;j<79;j++)
-						{
-							gotoxy(j,i);
-							printf(" ");
-						}	
-				}
-				gotoxy(34,12);
-				printf("Codigo do fornecedor: ");
-				scanf("%d",&Forn.Cod);
-			}
-			fclose(PtrForn);
 		}
+		fclose(PtrForn);
+	}
 }
 
 void ConsultarCliente(void) //consulcliente OK
 {
 	tpCliente Cli;
-	int pos, i, j;
+	int pos, i, j, fim=1;
+	char AuxCPF[TF];
 	FILE *PtrCli = fopen("Cliente.dat","rb");
 	
 	gotoxy(40 ,9);
 	printf("## Consulta de cliente ##"); 
-	gotoxy(60,11);
+	gotoxy(65,11);
 	printf("Sair '0' ");
 	if (PtrCli == NULL) //O Arquivo não existe!
 	{
@@ -535,14 +559,17 @@ void ConsultarCliente(void) //consulcliente OK
 		printf("Erro de abertura! Arquivo inexistente");
 	}	
 	else
+	{
+		
+		gotoxy(34,12);
+		printf("CPF do cliente: ");
+		fflush(stdin);
+		gets(AuxCPF);
+		while(fim!=0)
 		{
-			gotoxy(34,12);
-			printf("CPF do cliente: ");
-			fflush(stdin);
-			scanf("%s",&Cli.CPF);
-			while (Cli.CPF>0)
+			while (strlen(AuxCPF) && fim==1)
 			{
-				pos = BuscaCli(PtrCli,Cli.CPF);
+				pos = BuscaCli(PtrCli,AuxCPF);
 				if (pos==-1)
 				{
 					gotoxy(34,13);
@@ -563,7 +590,7 @@ void ConsultarCliente(void) //consulcliente OK
 						printf("valor total: %f", Cli.ValorTotal);	
 					}
 				getch();
-				for(i = 10;i<23;i++)
+				for(i = 12;i<23;i++)
 				{
 					for(j = 29;j<79;j++)
 						{
@@ -574,10 +601,14 @@ void ConsultarCliente(void) //consulcliente OK
 				gotoxy(34,12);
 				printf("CPF do cliente: ");
 				fflush(stdin);
-				scanf("%s",&Cli.CPF);
-			}
-			fclose(PtrCli);
+				gets(AuxCPF);
+			}	
+			if(strlen(AuxCPF)==1)
+				fim=0;
 		}
+		fclose(PtrCli);				
+	}
+
 }
 
 int BuscaAumentoPreco(FILE *Ptr, int cod)
@@ -886,6 +917,8 @@ void alteracaoProduto()
 				printf("Codigo do fornecedor: %d", Prod.CodForn);
 				fseek(PtrProd,pos,0);
 				fwrite(&Prod,sizeof(tpProduto),1,PtrProd);
+				gotoxy(34,20);
+				printf("Alteração realizada com sucesso!");
 			}
 			else
 			{
@@ -951,25 +984,248 @@ void alteracaoProduto()
 	fclose(PtrProd);
 }
 
+void alteracaoFornecedor()
+{
+	FILE *PtrForn = fopen("Fornecedor.dat","rb+" );
+	tpFornecedor Forn;
+	int auxCod, pos, i, j;
+	
+	gotoxy(40,9);
+	printf("## Alteracao de fornecedor ##"); 
+	gotoxy(65,11);
+	printf("Sair '0' ");
+	gotoxy(34,12);
+	printf("Codigo do fornecedor para alteracao: ");
+	scanf("%d", &auxCod);
+	rewind(PtrForn);
+	while(auxCod > 0)
+	{
+		pos=BuscaFornecedor(PtrForn, auxCod);
+		if(pos != -1)
+		{
+			fseek(PtrForn, pos, 0);
+			fread(&Forn, sizeof(tpFornecedor),1,PtrForn);
+			gotoxy(34,14);
+			printf("Detalhes do Fornecedor:");
+			gotoxy(34,15);
+			printf("Codigo: %d", Forn.Cod);
+			gotoxy(34,16);
+			printf("Nome: %s", Forn.Nome);
+			gotoxy(34,17);
+			printf("Cidade: %s", Forn.Cid);
+			gotoxy(34,19);
+			printf("Deseja alterar? S/N");
+			if(toupper(getche())=='S')
+			{
+				//limpar tela
+				for(i = 12;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}		
+				
+				gotoxy(34,14);
+				printf("Codigo: %d", Forn.Cod);
+				gotoxy(34,15);
+				printf("Nome: ");
+				fflush(stdin);
+				gets(Forn.Nome);
+				gotoxy(34,16);
+				printf("Cidade: ");
+				fflush(stdin);
+				gets(Forn.Cid);
+				fseek(PtrForn,pos,0);
+				fwrite(&Forn,sizeof(tpFornecedor),1,PtrForn);
+				gotoxy(34,18);
+				printf("Alteracao realizada com sucesso!");
+			}
+			else
+			{
+				//limpar tela
+				for(i = 10;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}						
+				gotoxy(34,14);
+				printf("Alteração cancelada!");
+				getch();
+			
+			}
+			getch();
+			gotoxy(34,19);
+			printf("Deseja alterar outro fornecedor? S/N");
+			if(toupper(getche())=='S')
+			{
+				//limpar tela
+				for(i = 12;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}	
+				gotoxy(65,11);
+				printf("Sair '0' ");	
+				gotoxy(34,12);	
+				printf("Codigo do fornecedor para alteracao: ");
+				scanf("%d", &auxCod);
+			}
+			else
+				auxCod=0;
+			
+		}
+		else
+		{
+			gotoxy(34,14);
+			printf("Fornecedor nao encontrado! ");
+			getch();
+			//limpar tela
+			for(i = 10;i<23;i++)
+					{
+						for(j = 29;j<79;j++)
+							{
+								gotoxy(j,i);
+								printf(" ");
+							}	
+					}
+			gotoxy(65,11);
+			printf("Sair '0' ");	
+			gotoxy(34,12);		
+			printf("Codigo do fornecedor para alteracao: ");
+			scanf("%d", &auxCod);
+		}
+	}
+	fclose(PtrForn);
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void alteracaoCliente()
+{
+	FILE *PtrCli= fopen("Cliente.dat","rb+" );
+	tpCliente Cli;
+	int  pos, i, j, fim=1;
+	char auxCod[TF];
+	
+	gotoxy(40,9);
+	printf("## Alteracao de cliente ##"); 
+	gotoxy(65,11);
+	printf("Sair '0' ");
+	gotoxy(34,12);
+	printf("CPF do cliente para alteracao: ");
+	fflush(stdin);
+	gets(auxCod);
+	scanf("%d", &auxCod);
+	rewind(PtrCli);
+	while(strlen(auxCod)==11 && fim!=0)
+	{
+		pos=BuscaCli(PtrCli, auxCod);
+		if(pos != -1)
+		{
+			fseek(PtrCli, pos, 0);
+			fread(&Cli, sizeof(tpCliente),1,PtrCli);
+			gotoxy(34,14);
+			printf("Detalhes do Cliente:");
+			gotoxy(34,15);
+			printf("CPF: %s", Cli.CPF);
+			gotoxy(34,16);
+			printf("Nome: %s", Cli.Nome);
+			gotoxy(34,18);
+			printf("Deseja alterar? S/N");
+			if(toupper(getche())=='S')
+			{
+				//limpar tela
+				for(i=12;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}		
+				
+				gotoxy(34,14);
+				printf("CPF: %s", Cli.CPF);
+				gotoxy(34,15);
+				printf("Nome: ");
+				fflush(stdin);
+				gets(Cli.Nome);
+				fseek(PtrCli,pos,0);
+				fwrite(&Cli, sizeof(tpCliente),1,PtrCli);
+				gotoxy(34,17);
+				printf("Alteração realizada com sucesso!");
+			}
+			else
+			{
+				//limpar tela
+				for(i = 10;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}						
+				gotoxy(34,14);
+				printf("Alteração cancelada!");
+				getch();
+			
+			}
+			getch();
+			gotoxy(34,18);
+			printf("Deseja alterar outro cliente? S/N");
+			if(toupper(getche())=='S')
+			{
+				//limpar tela
+				for(i = 10;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}	
+				gotoxy(65,11);
+				printf("Sair '0' ");	
+				gotoxy(34,12);	
+				printf("CPF do cliente para alteracao: ");
+				fflush(stdin);
+				gets(auxCod);
+			}
+			else
+				fim=0;
+			
+		}
+		else
+		{
+			gotoxy(34,14);
+			printf("Cliente nao encontrado! ");
+			getch();
+			//limpar tela
+			for(i = 10;i<23;i++)
+					{
+						for(j = 29;j<79;j++)
+							{
+								gotoxy(j,i);
+								printf(" ");
+							}	
+					}
+			gotoxy(65,11);
+			printf("Sair '0' ");	
+			gotoxy(34,12);		
+			printf("CPF do cliente para alteracao: ");
+			fflush(stdin);
+			gets(auxCod);
+		}
+	}
+	fclose(PtrCli);
+}
 
 void ExcluirFisProduto(void)
 {
@@ -1038,7 +1294,7 @@ void ExcluirFisProduto(void)
 					remove("Produto.dat");
 					rename("Temp.dat","Produto.dat");
 					
-					for(i = 10;i<23;i++)
+					for(i = 12;i<23;i++)
 					{
 						for(j = 29;j<79;j++)
 							{
@@ -1047,10 +1303,23 @@ void ExcluirFisProduto(void)
 							}	
 					}
 					gotoxy(34,14);
-					printf("Registro Excluido com sucesso!");
+					printf("Arquivo Excluido com sucesso!");
 					getch();	
 				}
-				
+				else
+				{
+					for(i = 12;i<23;i++)
+					{
+						for(j = 29;j<79;j++)
+							{
+								gotoxy(j,i);
+								printf(" ");
+							}	
+					}						
+					gotoxy(34,12);
+					printf("Exclusao cancelada!");
+					getch();
+				}
 			}
 			//limpar tela
 			for(i = 10;i<23;i++)
@@ -1062,7 +1331,7 @@ void ExcluirFisProduto(void)
 							}	
 					}
 			gotoxy(34,12);
-			printf("Deseja excluir outro item? S/N");
+			printf("Deseja excluir outro produto? S/N");
 			if(toupper(getche())=='S')
 			{
 				gotoxy(65,11);
@@ -1077,6 +1346,274 @@ void ExcluirFisProduto(void)
 		fclose(PtrProd);
 	}
 }
+
+void ExcluirFisFornecedor(void)
+{
+	FILE *PtrForn = fopen("Fornecedor.dat","rb");
+	int pos, Cod, i, j;
+	tpFornecedor Forn;
+	gotoxy(36,9);
+	printf("### Exclusao fisica de fornecedor ###"); 
+	if (PtrForn == NULL) //O Arquivo não existe!
+	{
+		gotoxy(34,12);
+		printf("Erro de abertura!");
+	}
+				
+	else
+	{
+		gotoxy(65,11);
+		printf("Sair '0' ");
+		gotoxy(34,12);
+		printf("Codigo do fornecedor: ");
+		scanf("%d",&Cod);
+		while(Cod>0)
+		{
+			pos = BuscaFornecedor(PtrForn,Cod);
+			if (pos==-1)
+			{	gotoxy(34,14);
+				printf("Fornecedor nao encontrado!");
+				getch();
+			}
+			else
+			{
+				gotoxy(34,14);
+				printf("Detalhes do Registro: ");
+				//fseek(Ptr,deslocamento Bytes,a partir de);
+				fseek(PtrForn,pos,0);
+				fread(&Forn,sizeof(tpFornecedor),1,PtrForn);
+				gotoxy(34,15);
+				printf("Codigo: %d", Forn.Cod);
+				gotoxy(34,16);
+				printf("Nome: %s", Forn.Nome);
+				gotoxy(34,17);
+				printf("Cidade: %s", Forn.Cid);
+				
+				gotoxy(34,22);
+				printf("Confirma Exclusao (S/N)? ");
+				if(toupper(getche())=='S')
+				{
+					FILE *PtrTemp = fopen("Temp.dat","wb");
+					rewind(PtrForn); //fseek(PtrFunc,0,0);
+					fread(&Forn ,sizeof(tpFornecedor),1,PtrForn);
+					while (!feof(PtrForn))
+					{
+						if(Cod != Forn.Cod)
+							fwrite(&Forn ,sizeof(tpFornecedor),1, PtrTemp);
+							
+						fread(&Forn,sizeof(tpFornecedor),1,PtrForn);
+					}
+					fclose(PtrForn);
+					fclose(PtrTemp);
+					remove("Fornecedor.dat");
+					rename("Temp.dat","Fornecedor.dat");
+					
+					for(i = 12;i<23;i++)
+					{
+						for(j = 29;j<79;j++)
+							{
+								gotoxy(j,i);
+								printf(" ");
+							}	
+					}
+					gotoxy(34,14);
+					printf("Arquivo Excluido com sucesso!");
+					getch();	
+				}
+				else
+				{
+					for(i = 12;i<23;i++)
+					{
+						for(j = 29;j<79;j++)
+							{
+								gotoxy(j,i);
+								printf(" ");
+							}	
+					}						
+					gotoxy(34,12);
+					printf("Exclusao cancelada!");
+					getch();
+				}			
+				
+			}
+			//limpar tela
+			for(i = 10;i<23;i++)
+					{
+						for(j = 29;j<79;j++)
+							{
+								gotoxy(j,i);
+								printf(" ");
+							}	
+					}
+			gotoxy(34,12);
+			printf("Deseja excluir outro fornecedor? S/N");
+			if(toupper(getche())=='S')
+			{
+				gotoxy(65,11);
+				printf("Sair '0' ");
+				gotoxy(34,12);
+				printf("Codigo do produto: ");
+				scanf("%d",&Cod);
+			}
+			else
+				Cod=0;
+		}
+		fclose(PtrForn);
+	}
+}
+
+void ExcluirFisCliente(void)
+{
+	FILE *PtrCli = fopen("Cliente.dat","rb");
+	int pos, i, j, fim=1;
+	char Cod[TF];
+	tpCliente Cli;
+	gotoxy(36,9);
+	printf("### Exclusao fisica de cliente ###"); 
+	if (PtrCli == NULL) //O Arquivo não existe!
+	{
+		gotoxy(34,12);
+		printf("Erro de abertura!");
+	}			
+	else
+	{
+		gotoxy(65,11);
+		printf("Sair '0' ");
+		gotoxy(34,12);
+		printf("CPF do cliente: ");
+		fflush(stdin);
+		gets(Cod);
+		while(fim!=0)
+		{
+			while(strlen(Cod) == 11 && fim==1)
+			{
+				pos = BuscaCli(PtrCli,Cod);
+				if (pos==-1)
+				{	gotoxy(34,14);
+					printf("Cliente nao encontrado!");
+					getch();
+				}
+				else
+				{
+					gotoxy(34,14);
+					printf("Detalhes do Registro: ");
+					//fseek(Ptr,deslocamento Bytes,a partir de);
+					fseek(PtrCli,pos,0);
+					fread(&Cli,sizeof(tpCliente),1,PtrCli);
+					gotoxy(34,15);
+					printf("Codigo: %s", Cli.CPF);
+					gotoxy(34,16);
+					printf("Nome: %s", Cli.Nome);
+					gotoxy(34,17);
+					printf("Quantidade de compras: %d", Cli.QtdeCompras);
+					gotoxy(34,18);
+					printf("Valor total: %f", Cli.ValorTotal);
+					
+					gotoxy(34,22);
+					printf("Confirma Exclusao (S/N)? ");
+					if(toupper(getche())=='S')
+					{
+						FILE *PtrTemp = fopen("Temp.dat","wb");
+						rewind(PtrCli); //fseek(PtrFunc,0,0);
+						fread(&Cli ,sizeof(tpCliente),1,PtrCli);
+						while (!feof(PtrCli))
+						{
+							if(Cod != Cli.CPF)
+								fwrite(&Cli ,sizeof(tpCliente),1, PtrTemp);
+								
+							fread(&Cli, sizeof(tpCliente),1,PtrCli);
+						}
+						fclose(PtrCli);
+						fclose(PtrTemp);
+						remove("Cliente.dat");
+						rename("Temp.dat","Cliente.dat");
+						
+						for(i = 12;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}
+						gotoxy(34,14);
+						printf("Arquivo Excluido com sucesso!");
+						getch();	
+					}
+					else
+					{
+						for(i = 12;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}						
+						gotoxy(34,12);
+						printf("Exclusao cancelada!");
+						getch();
+					}					
+				}
+				
+				//limpar tela
+				for(i = 10;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}
+				gotoxy(34,12);
+				printf("Deseja excluir outro cliente? S/N");
+				if(toupper(getche())=='S')
+				{
+					gotoxy(65,11);
+					printf("Sair '0' ");
+					gotoxy(34,12);
+					printf("CPF do cliente: ");
+					fflush(stdin);
+					gets(Cod);
+				}
+				else
+				{
+					fim=0;
+					//limpar tela
+					for(i = 10;i<23;i++)
+							{
+								for(j = 29;j<79;j++)
+									{
+										gotoxy(j,i);
+										printf(" ");
+									}	
+							}					
+				}			
+			}			
+		}
+		fclose(PtrCli);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1705,11 +2242,11 @@ int main(void)
 																		break;
 														
 															case 'B':	limparTela();	
-																		//fornecedor
+																		ExcluirFisFornecedor();//fornecedor
 																		break;
 														
 															case 'C':	limparTela();
-																		//cliente
+																		ExcluirFisCliente();//cliente
 																		break;
 														}
 														break;
@@ -1743,11 +2280,11 @@ int main(void)
 														break;
 														
 											case 'B':	limparTela();	
-														//fornecedor
+														alteracaoFornecedor();//fornecedor
 														break;
 														
 											case 'C':	limparTela();
-														//cliente
+														alteracaoCliente();//cliente
 														break;
 										}
 										break;
